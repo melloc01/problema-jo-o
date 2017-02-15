@@ -117,6 +117,10 @@ export default class Facts {
     }
   }
 
+  /**
+   * Applies the schema and save the results into the actualFacts property.
+   * @return {void}
+   */
   applySchema () {
     this.items.map(fact => {
       const {attribute, valid} = parseFact(fact)
