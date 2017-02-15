@@ -6,4 +6,9 @@ import getActualFacts from './getActualFactsHashmap'
 const schemaObject = parseSchema(schema)
 const actualFacts = getActualFacts(schemaObject, facts)
 
-console.table(actualFacts)
+// better visualization on browser
+if (typeof console.table === 'function') {
+  console.table(actualFacts)
+} else {
+  console.log(actualFacts)
+}
