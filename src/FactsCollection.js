@@ -1,6 +1,14 @@
 import { parseFact } from './parsers'
 import { validateAttributeSchema } from './validators'
-export default class Facts {
+import { createHash } from './utils'
+
+/**
+ * Facts collection class.
+ *
+ * @export
+ * @class FactsCollection
+ */
+export default class FactsCollection {
 
   /**
    * Class constructor.
@@ -23,9 +31,9 @@ export default class Facts {
   add (fact) {
     const attribute = fact[1]
     let addedIndex = -1
+
     if (this.schema[attribute].cardinality === 'one') {
       const idx = this.find(fact)
-
       // look for actual facts to overwrite the existing one
       // if not present, push
       if (idx === -1) {
@@ -51,13 +59,8 @@ export default class Facts {
    * @return {Number} index   The index of the item on the this.actualItems array
    */
   find (fact) {
-    const [entityName, attribute] = fact
-
-    if (this.hashMap[entityName] && this.hashMap[entityName][attribute]) {
-      return this.hashMap[entityName][attribute]['index']
-    }
-
-    return -1
+    const hash = this.createFactHash(fact)
+    return this.hashMap[hash] || -1
   }
 
   /**
@@ -88,20 +91,19 @@ export default class Facts {
    * @param {Number} index  The index of the item on this.actualItems array
    */
   addToHashMap (fact, index) {
-    const [entityName, attribute, value] = fact
+    const hash = this.createFactHash(fact)
+    this.hashMap[hash] = index
+  }
 
-    if (!this.hashMap[entityName]) {
-      this.hashMap[entityName] = {}
-    }
-
-    if (!this.hashMap[entityName][attribute]) {
-      this.hashMap[entityName][attribute] = {}
-    }
-
-    if (!this.hashMap[entityName][attribute][value]) {
-      this.hashMap[entityName][attribute]['index'] = index
-      this.hashMap[entityName][attribute]['value'] = value
-    }
+  /**
+   * Creates a hash based on a fact.
+   *
+   * @param {object} fact
+   *
+   * @memberOf Facts
+   */
+  createFactHash (fact) {
+    return createHash(`${fact.entityName}${fact.attribute}`)
   }
 
   /**
